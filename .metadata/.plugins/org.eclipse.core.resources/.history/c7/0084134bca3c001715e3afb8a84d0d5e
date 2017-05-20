@@ -1,4 +1,0 @@
-package com.security.repository;
-
-public interface RoleRepository extends JpaRepository<Role, Long>{
-}
