@@ -1,0 +1,6 @@
+package com.security.services;
+
+public interface UserDetailService {
+
+	  UserDetails loadUserByUsername(String username) throws UsernameNotFoundException;
+}

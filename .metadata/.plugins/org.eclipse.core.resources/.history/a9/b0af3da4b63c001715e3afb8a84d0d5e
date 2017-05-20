@@ -1,0 +1,19 @@
+package com.security.controller;
+
+import org.springframework.stereotype.Controller;
+
+@Controller
+public class UserController {
+
+	 private final UserService userService;
+
+	    @Autowired
+	    public UsersController(UserService userService) {
+	        this.userService = userService;
+	    }
+
+	    @RequestMapping("/users")
+	    public ModelAndView getUsersPage() {
+	        return new ModelAndView("users", "users", userService.getAllUsers());
+	    }
+}

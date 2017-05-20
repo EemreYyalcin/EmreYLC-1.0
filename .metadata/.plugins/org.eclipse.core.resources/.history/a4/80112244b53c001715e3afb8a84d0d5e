@@ -1,0 +1,8 @@
+package com.security.serviceImplements;
+
+import com.security.services.UserService;
+
+@Service
+public class UserServiceImpl implements UserService{
+
+}

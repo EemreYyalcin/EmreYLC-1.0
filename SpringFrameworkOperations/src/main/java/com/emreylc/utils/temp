@@ -1,0 +1,16 @@
+
+	private String email;
+
+	private String phone;
+
+	private Date birnDate;
+
+	private String description;
+	
+	private Date singUpDate;
+
+	private int pollCount = 0;
+
+	private Date lastSeenDate;
+
+	private String userType;

@@ -1,0 +1,10 @@
+package com.security.serviceImplements;
+
+import org.springframework.stereotype.Service;
+
+import com.security.services.UserService;
+
+@Service
+public class UserServiceImpl implements UserService {
+
+}

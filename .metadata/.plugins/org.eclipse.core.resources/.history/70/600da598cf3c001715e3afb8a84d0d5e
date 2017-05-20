@@ -1,0 +1,8 @@
+package com.security.services;
+
+public interface SercurityService {
+
+	public String findLoggedInUsername();
+
+	public void autologin(String username, String password);
+}
