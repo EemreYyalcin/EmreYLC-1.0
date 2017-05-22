@@ -1,64 +1,63 @@
 package com.security.controller;
 
+import java.util.NoSuchElementException;
+
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.servlet.ModelAndView;
 
 import com.security.domain.User;
-import com.security.services.SecurityService;
-import com.security.services.UserService;
-import com.security.validator.UserValidator;
+import com.security.service.UserService;
+import com.security.validation.RegisterValidator;
 
 @Controller
 public class UserController {
-	@Autowired
-	private UserService userService;
+
+	private final UserService userService;
+	private final RegisterValidator registerValidator;
 
 	@Autowired
-	private SecurityService securityService;
-
-	@Autowired
-	private UserValidator userValidator;
-
-	@RequestMapping(value = "/registration", method = RequestMethod.GET)
-	public String registration(Model model) {
-		model.addAttribute("userForm", new User());
-
-		return "registration";
+	public UserController(UserService userService, RegisterValidator registerValidator) {
+		this.userService = userService;
+		this.registerValidator = registerValidator;
 	}
 
-	@RequestMapping(value = "/registration", method = RequestMethod.POST)
-	public String registration(@ModelAttribute("userForm") User userForm, BindingResult bindingResult, Model model) {
-		userValidator.validate(userForm, bindingResult);
+	@InitBinder
+	public void initBinder(WebDataBinder binder) {
+		binder.addValidators(registerValidator);
+	}
 
+	@RequestMapping("/register")
+	public ModelAndView getRegisterPage() {
+		return new ModelAndView("register", "user", new User());
+	}
+
+	@RequestMapping(value = "/register", method = RequestMethod.POST)
+	public String handleRegisterForm(@Valid @ModelAttribute("user") User user, BindingResult bindingResult) {
 		if (bindingResult.hasErrors()) {
-			return "registration";
+			return "register";
+		}
+		userService.addUser(user);
+		return "redirect:/";
+	}
+
+	@RequestMapping("/users/{id}/items")
+	public ModelAndView getUserPage(@PathVariable Long id) {
+		if (userService.getUserById(id) == null) {
+			throw new NoSuchElementException("User with id:" + id + " not found");
+		} else {
+			return new ModelAndView("userItems", "items", userService.getUserOfItems(id));
 		}
 
-		userService.save(userForm);
-
-		securityService.autologin(userForm.getUsername(), userForm.getPasswordConfirm());
-
-		return "redirect:/welcome";
 	}
 
-	@RequestMapping(value = "/login", method = RequestMethod.GET)
-	public String login(Model model, String error, String logout) {
-		if (error != null)
-			model.addAttribute("error", "Your username and password is invalid.");
-
-		if (logout != null)
-			model.addAttribute("message", "You have been logged out successfully.");
-
-		return "login";
-	}
-
-	@RequestMapping(value = { "/", "/welcome" }, method = RequestMethod.GET)
-	public String welcome(Model model) {
-		return "welcome";
-	}
 }
